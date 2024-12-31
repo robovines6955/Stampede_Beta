@@ -29,11 +29,11 @@ public class Robot {
      * We divide by the number of data points and the distance traveled to get the average encoder count per unit per wheel.
      * You might get negative encoder values but use the absolute value in the equation.
      */
-    public static double FORWARD_ENCODER_COUNTS_PER_INCH = ((4253 + 4245 + 4251 + 4245 + 4265 + 4271 + 4279 + 4271 + 4291 + 4285 + 4296 + 4301) / 12.0) / 120.0;
+    public static double FORWARD_ENCODER_COUNTS_PER_INCH = ((3358 + 3439 + 3362 + 3416) / 4.0) / 96.0;
     //All values are positive when we strafe right.
-    public static double RIGHT_ENCODER_COUNTS_PER_INCH = ((4872 + 4872 + 4890 + 4922 + 4943 + 4932 + 4956 + 4951 + 4850 + 4857 + 4818 + 4831) / 12.0) / 120.0;
+    public static double RIGHT_ENCODER_COUNTS_PER_INCH = ((4109 + 4056 + 3899 + 3884) / 4.0) / 96.0;
     //We rotated 10 times twice. Rear wheels were negative when rotation was clockwise.
-    public static double CW_ENCODER_COUNTS_PER_DEGREE = ((30373 + 30397 + 30461 + 30448 + 30558 + 30576 + 30568 + 30581) / 8.0) / 10.0 / 360;
+    public static double CW_ENCODER_COUNTS_PER_DEGREE = ((28859 + 28843 + 28849 + 28840) / 4.0) / 10.0 / 360;
 
     public AngleTrackerIMU angleTracker;
 

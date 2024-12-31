@@ -43,6 +43,8 @@ public class Tele_Op extends OpMode {
     Robot robot;
     double x1, y1, x2;
     double speedfactor = 0.5;
+    double driveAngle = 0;
+    double driveAngleCheckTime = 0;
     ElapsedTime holdTimer = new ElapsedTime();
 
     public void initRobot() {
@@ -88,42 +90,46 @@ public class Tele_Op extends OpMode {
     @Override
     public void loop() {
 
+        //turn correcting
         if (Math.abs(gamepad1.left_stick_y) > .2) {
             y1 = -gamepad1.left_stick_y;
-        } else {
-            y1 = 0;
         }
         if (Math.abs(gamepad1.left_stick_x) > .2) {
             x1 = gamepad1.left_stick_x;
-        } else {
-            x1 = 0;
         }
+        boolean corrected = false;
         if (Math.abs(gamepad1.right_stick_x) > .2) {
+            // are we turning?  If so, remember our current heading
             x2 = gamepad1.right_stick_x;
+            driveAngle = robot.angleTracker.getOrientation();
+            driveAngleCheckTime = getRuntime() + 0.25;
+
+        } else if (Math.abs(gamepad1.left_stick_x) > .2 || Math.abs(gamepad1.left_stick_y) > .2 &&
+                getRuntime() > driveAngleCheckTime) {
+            // we aren't turning, but we are moving.  Rotate back to the original heading when we started moving
+            if (Math.abs(robot.angleDifference(robot.angleTracker.getOrientation(), driveAngle)) > 0.5) {
+                x2 = robot.angleDifference(robot.angleTracker.getOrientation(), driveAngle) / 25;
+                corrected = true;
+            }
         } else {
-            x2 = 0;
+            // we aren't moving at all, note which way we are facing
+            driveAngle = robot.angleTracker.getOrientation();
         }
         if (gamepad1.left_trigger > .4) {
             speedfactor = 0.25;
         } else if (gamepad1.right_trigger > .2) {
             speedfactor = 1;
-        } else {
-            speedfactor = .4;
-
         }
-
-        //with reverse button, only need to reverse for forward and back (not turning)
         x1 *= speedfactor;
         y1 *= speedfactor;
         x2 *= speedfactor;
-
-
         robot.drive(y1, x1, x2, telemetry);
 
         //SparkFunOTOS.Pose2D pos = robot.myOtos.getPosition();
 
         double totalRotationInDeg = robot.angleTracker.getOrientation();
         telemetry.addData("Heading", "%5.2f", ((totalRotationInDeg % 360) + 360) % 360);
+        telemetry.addData("corrected", corrected ? "Yes" : "No");
         //telemetry.addData("X coordinate", pos.x);
         //telemetry.addData("Y coordinate", pos.y);
         //telemetry.addData("Heading angle", pos.h);
